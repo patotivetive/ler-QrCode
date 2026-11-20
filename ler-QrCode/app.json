@@ -1,35 +1,35 @@
-{
-  "expo": {
-    "name": "ler-QrCode",
-    "slug": "ler-QrCode",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+  {
+    "expo": {
+      "name": "ler-QrCode",
+      "slug": "ler-QrCode",
+      "version": "1.0.0",
+      "orientation": "portrait",
+      "icon": "./assets/icon.png",
+      "userInterfaceStyle": "light",
+      "ios": {
+        "supportsTablet": true
       },
-      "predictiveBackGestureEnabled": false
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },    "plugins": [
-      [
-        "expo-camera",
-        {
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
-          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
-          "recordAudioAndroid": true,
-          "barcodeScannerEnabled": true
-        }
+      "android": {
+        "adaptiveIcon": {
+          "backgroundColor": "#E6F4FE",
+          "foregroundImage": "./assets/android-icon-foreground.png",
+          "backgroundImage": "./assets/android-icon-background.png",
+          "monochromeImage": "./assets/android-icon-monochrome.png"
+        },
+        "predictiveBackGestureEnabled": false
+      },
+      "web": {
+        "favicon": "./assets/favicon.png"
+      },    "plugins": [
+        [
+          "expo-camera",
+          {
+            "cameraPermission":  "Ler QrCode? usa a câmera para ler o código de barras dos produtos.",
+            "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+            "recordAudioAndroid": true,
+            "barcodeScannerEnabled": true
+          }
+        ]
       ]
-    ]
+    }
   }
-}

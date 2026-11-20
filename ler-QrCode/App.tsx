@@ -1,78 +1,96 @@
-
-import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { BarcodeScanningResult, useCameraPermissions } from 'expo-camera';
+
+import { PRODUTOS } from './dados/produtos';
+import AreaCamera from './components/AreaCamera';
+import CartaoResultado from './components/CartaoResultado';
+import ListaProdutos from './components/ListaProdutos';
+import TelaPermissao from './components/TelaPermissao';
 
 export default function App() {
-  const [facing, setFacing] = useState<CameraType>('back');
-  const [permission, requestPermission] = useCameraPermissions();
+  const [permissao, pedirPermissao] = useCameraPermissions();
+  const [codigoLido, setCodigoLido] = useState<string | null>(null);
 
-  if (!permission) {
-    return <View />;
+  const leituraTravada = useRef(false);
+
+  const produtoEncontrado =
+    codigoLido !== null ? PRODUTOS.find((produto) => produto.codigo === codigoLido) : undefined;
+
+  function aoLerCodigo({ data }: BarcodeScanningResult) {
+    if (leituraTravada.current) return;
+    leituraTravada.current = true;
+    setCodigoLido(data);
   }
 
-  if (!permission.granted) {
+  function escanearNovamente() {
+    leituraTravada.current = false;
+    setCodigoLido(null);
+  }
+
+  function renderConteudo() {
+    if (!permissao) {
+      return (
+        <View style={styles.centro}>
+          <ActivityIndicator size="large" color="#1d4ed8" />
+        </View>
+      );
+    }
+
+    if (!permissao.granted) {
+      return (
+        <TelaPermissao
+          podePerguntarDeNovo={permissao.canAskAgain}
+          onPedirPermissao={pedirPermissao}
+        />
+      );
+    }
+
     return (
-      <View style={styles.container}>
-        <Text style={styles.message}>Permissão para acessar câmera:</Text>
-        <Button onPress={requestPermission} title="coonceder permissão" />
-      </View>
+      <>
+        <AreaCamera onBarcodeScanned={codigoLido === null ? aoLerCodigo : undefined} />
+        <CartaoResultado
+          codigoLido={codigoLido}
+          produto={produtoEncontrado}
+          onEscanearNovamente={escanearNovamente}
+        />
+        <ListaProdutos produtos={PRODUTOS} codigoDestacado={produtoEncontrado?.codigo} />
+      </>
     );
   }
 
-  function toggleCameraFacing() {
-    setFacing(current => (current === 'back' ? 'front' : 'back'));
-  }
-
   return (
-    <View style={styles.container}>
-   <Text style={styles.titulo}>Tem na lista?</Text>
-      <CameraView style={styles.camera} facing={facing} />
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-          <Text style={styles.text}>Flip Camera</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.container}>
+        <StatusBar style="dark" />
+        <View style={styles.cabecalho}>
+          <Text style={styles.tituloApp}>Tem na lista?</Text>
+        </View>
+        {renderConteudo()}
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "space-evenly",
-    padding: 12,
+    backgroundColor: '#f9fafb',
   },
-  titulo: {
-    fontSize: 28,
-    fontWeight: "bold",
-  },
-  message: {
-    textAlign: 'center',
-    paddingBottom: 10,
-  },
-  camera: {
-    flex: 1,
-  },
-  buttonContainer: {
-    position: 'absolute',
-    bottom: 64,
-    flexDirection: 'row',
-    backgroundColor: 'transparent',
-    width: '100%',
-    paddingHorizontal: 64,
-  },
-  button: {
-    flex: 1,
+  cabecalho: {
+    paddingVertical: 14,
     alignItems: 'center',
   },
-  text: {
+  tituloApp: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: 'white',
+    color: '#101828',
+  },
+  centro: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
-
